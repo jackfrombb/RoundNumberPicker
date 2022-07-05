@@ -25,8 +25,8 @@ import java.util.ArrayList;
 
 public class RoundNumberPicker extends RelativeLayout {
 
-    ArrayList<TextView> numbers = new ArrayList<>();
-    View cursor;
+    private final ArrayList<TextView> numbers = new ArrayList<>();
+    private View cursor;
 
     private float parentRadius;
     private float parentDiameter;
@@ -40,10 +40,10 @@ public class RoundNumberPicker extends RelativeLayout {
     private int startPosition;
     private int itemCount = 12;
 
-    int waitAllItems = 0;
+    private int waitAllItems = 0;
 
     @Nullable
-    private OnNumberChangeListener onHourChangeListener;
+    private OnNumberChangeListener onNumberChangeListener;
 
     public RoundNumberPicker(Context context) {
         super(context);
@@ -96,7 +96,6 @@ public class RoundNumberPicker extends RelativeLayout {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 moved = false;
-                //Log.i("Positioning", "On action DOWN: " + moved);
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -105,15 +104,11 @@ public class RoundNumberPicker extends RelativeLayout {
                 break;
 
             case MotionEvent.ACTION_UP:
-                if (moved) {
-                    if (onHourChangeListener != null)
-                        onHourChangeListener.onChange(selectedHour + startPosition);
-                } else {
-                    //Log.i("Positioning", "On action UP. Not moved");
+                if (!moved) {
                     selectedHour = onFaceClockTouch(x, y);
-                    if (onHourChangeListener != null)
-                        onHourChangeListener.onChange(selectedHour + startPosition);
                 }
+                if (onNumberChangeListener != null)
+                    onNumberChangeListener.onChange(selectedHour + startPosition);
 
                 setCursor(selectedHour);
                 moved = false;
@@ -147,12 +142,9 @@ public class RoundNumberPicker extends RelativeLayout {
 
     /**
      * Получить расположение для курсора
-     * @param textView привязка к числу
      * @return расположение для курсора
      */
-    private LayoutParams getCursorLayoutParams(TextView textView){
-        LayoutParams textLayoutParams = (LayoutParams) textView.getLayoutParams();
-
+    private LayoutParams getCursorLayoutParams(){
         LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 
         int width =  dpToPx(40);
@@ -168,8 +160,8 @@ public class RoundNumberPicker extends RelativeLayout {
     /**
      * Установить слушателя при выборе числа на окружности
      */
-    public void setOnNumberChangeListener(@Nullable OnNumberChangeListener onHourChangeListener) {
-        this.onHourChangeListener = onHourChangeListener;
+    public void setOnNumberChangeListener(@Nullable OnNumberChangeListener onNumberChangeListener) {
+        this.onNumberChangeListener = onNumberChangeListener;
     }
 
     /**
@@ -254,7 +246,7 @@ public class RoundNumberPicker extends RelativeLayout {
     /**
      * Удаляет и заново добавляет числа на окружность
      */
-    private void refresh(){
+    public void refresh(){
         removeAllViews();
         numbers.clear();
         addNumbers();
@@ -295,7 +287,7 @@ public class RoundNumberPicker extends RelativeLayout {
             cursor.setId(View.generateViewId());
             cursor.setBackground(AppCompatResources.getDrawable(getContext(), R.drawable.selected_dot));
 
-            LayoutParams layoutParams = getCursorLayoutParams(textView);
+            LayoutParams layoutParams = getCursorLayoutParams();
             addView(cursor, layoutParams);
             requestLayout();
         }

@@ -30,7 +30,6 @@
 
         </ru.boringbar.roundnumberpicker.RoundNumberPicker>
 
-
         <ru.boringbar.roundnumberpicker.RoundNumberPicker
             android:id="@+id/time_picker"
             android:layout_width="0dp"
